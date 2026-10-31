@@ -22,3 +22,5 @@ test('serverless API initializes once and persists authenticated writes',async()
  assert.equal(JSON.parse((await send('/api/projects')).value).length,1);assert.equal(initializations,1);
  }finally{if(server)await new Promise(r=>server.close(r));await mongoose.disconnect();await mongo.stop();}
 });
+
+test('Atlas authentication errors identify the credential problem without exposing secrets',async()=>{const handler=createVercelHandler({readConfig:()=>({}),connect:async()=>{throw Object.assign(new Error('auth failed with private connection details'),{name:'MongoServerError',code:18,codeName:'AuthenticationFailed'});}});const res={status(code){this.code=code;return this;},json(body){this.body=body;return this;}};await handler({},res);assert.equal(res.code,503);assert.match(res.body.error,/Atlas rejected/);assert.ok(!res.body.error.includes('private connection details'));});
