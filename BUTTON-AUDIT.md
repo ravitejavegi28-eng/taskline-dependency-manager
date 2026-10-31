@@ -2,6 +2,7 @@
 
 Verified on 31 October 2026 against a separate temporary MongoDB database.
 
+- Passed: Shared demo sign-in rejects incorrect credentials and opens with correct credentials
 - Passed: All five navigation buttons and brand home link
 - Passed: Sidebar Explore dependencies
 - Passed: Board, List, Map, zoom in, zoom out and fit view

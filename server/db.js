@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { seedProject } from './seed.js';
@@ -12,6 +11,8 @@ export let databaseMode = 'MongoDB';
 export async function connectDatabase() {
   let uri = process.env.MONGODB_URI;
   if (!uri) {
+    if (process.env.VERCEL === '1' || process.env.RENDER === 'true' || process.env.APP_MODE === 'hosted') throw new Error('Hosted mode requires MONGODB_URI.');
+    const { MongoMemoryServer } = await import('mongodb-memory-server-core');
     const dbPath = path.resolve('data/mongodb');
     await mkdir(dbPath, { recursive: true });
     process.env.MONGOMS_DOWNLOAD_DIR = path.resolve('data/binaries');

@@ -82,6 +82,8 @@ Tests cover graph correctness and use a separate temporary real MongoDB instance
 
 ## Hosting
 
+Vercel hosting is also supported: follow [VERCEL-DEPLOYMENT.md](VERCEL-DEPLOYMENT.md). Its API adapter lives in the root `api` directory; deploy the whole repository.
+
 Render hosting is supported with MongoDB Atlas and a shared evaluator login. Follow [DEPLOYMENT.md](DEPLOYMENT.md). Local use requires no login.
 
 ## Access and limitations

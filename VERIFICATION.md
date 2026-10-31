@@ -22,3 +22,5 @@ Additional full interaction audit: 30 button/workflow scenarios passed. See BUTT
 
 
 Render adaptation: 15 automated checks pass, including hosted configuration, shared demo authentication, allowed host, HTTPS origin handling and health checks. Cloud settings were tested locally; the actual Render-to-Atlas connection must be verified after deployment. The browser audit was also rerun for local workflow regressions.
+
+Vercel adaptation: tests cover canonical hosted configuration, JSON initialization errors without leaked connection details, initialization reuse, and authenticated database writes through the actual API adapter. Browser coverage includes the shared evaluator sign-in screen. Live Vercel-to-Atlas connectivity depends on the production environment and network access settings.

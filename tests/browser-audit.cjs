@@ -27,7 +27,12 @@ const fs=require('node:fs/promises');
   const selectProject=async(id)=>{await closeDetails();await page.getByLabel('Current project').first().selectOption(id);};
   const dbProject=async()=>page.evaluate(()=>fetch('/api/projects').then(r=>r.json()));
   const waitRevision=async(id,revision)=>{await page.waitForFunction(async({id,revision})=>{const p=await fetch('/api/projects').then(r=>r.json());return p.find(x=>x.id===id)?.revision>=revision;},{id,revision});};
-  await page.goto(`http://127.0.0.1:${server.address().port}`);await page.getByRole('heading',{name:'Build task APIs',exact:true}).waitFor();
+  const testAuth='Basic '+Buffer.from('evaluator:browser-test-password').toString('base64');
+  await page.route('**/api/projects',async route=>{if(route.request().method()==='GET'&&route.request().headers().authorization!==testAuth)await route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({error:'Demo sign-in required'})});else await route.continue();});
+  await page.goto(`http://127.0.0.1:${server.address().port}`);
+  await page.getByRole('heading',{name:'Open your workspace',exact:true}).waitFor();await page.getByLabel('Password',{exact:true}).fill('wrong-password');await button('Open workspace').click();await page.getByRole('alert').waitFor();await page.getByLabel('Password',{exact:true}).fill('browser-test-password');await button('Open workspace').click();
+  pass('Shared demo sign-in rejects incorrect credentials and opens with correct credentials');
+  await page.unroute('**/api/projects');await page.getByRole('heading',{name:'Build task APIs',exact:true}).waitFor();
   for(const [route,title] of [['Overview','Project overview'],['Tasks','Project tasks'],['Dependencies','Dependency map'],['Team','Your team'],['Activity','Project activity']]){await nav(route).click();await page.getByRole('heading',{name:title,exact:true}).waitFor();}
   await page.locator('a.brand').click();await page.getByRole('heading',{name:'Project overview',exact:true}).waitFor();
   pass('All five navigation buttons and brand home link');
