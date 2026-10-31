@@ -7,6 +7,10 @@ export function createVercelHandler({ readConfig = runtimeConfig, connect = conn
   let ready;
   return async function handler(req, res) {
     try {
+      // Vercel forwards every API depth to one function; restore its Express path.
+      const routed = req.query?.__taskline_route;
+      if (routed !== undefined) req.url = '/api/' + (Array.isArray(routed) ? routed.join('/') : routed);
+
       if (!ready) ready = (async () => { const config = readConfig(); await connect(); return makeApp(config); })();
       const app = await ready;
       return app(req, res);

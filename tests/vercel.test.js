@@ -19,7 +19,7 @@ test('serverless API initializes once and persists public writes without authori
  const send=(route,method='GET',body,authorized=false)=>new Promise((resolve,reject)=>{const req=httpRequest({hostname:'127.0.0.1',port:server.address().port,path:route,method,headers:{Host:'demo.vercel.app','Content-Type':'application/json',Origin:'https://demo.vercel.app',...(authorized?{Authorization:auth}:{})}},res=>{let value='';res.setEncoding('utf8');res.on('data',part=>value+=part);res.on('end',()=>resolve({status:res.statusCode,value}));});req.on('error',reject);req.end(body?JSON.stringify(body):undefined);});
  assert.equal((await send('/api/health')).status,200);assert.equal((await send('/api/projects','GET',null,false)).status,200);
  const created=await send('/api/projects','POST',{name:'Vercel adapter project'});assert.equal(created.status,201);assert.equal(JSON.parse(created.value).name,'Vercel adapter project');
- assert.equal(JSON.parse((await send('/api/projects')).value).length,1);assert.equal(initializations,1);
+ const project=JSON.parse(created.value);const updated=await send('/api/handler?__taskline_route=projects/'+project.id,'PUT',{revision:0,tasks:[]});assert.equal(updated.status,200);assert.equal(JSON.parse(updated.value).revision,1);assert.equal(JSON.parse((await send('/api/handler?__taskline_route=projects')).value).length,1);assert.equal(initializations,1);
  }finally{if(server)await new Promise(r=>server.close(r));await mongoose.disconnect();await mongo.stop();}
 });
 

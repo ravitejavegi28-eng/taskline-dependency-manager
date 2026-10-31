@@ -1,6 +1,6 @@
 # Vercel deployment
 
-The Vite frontend and Express API deploy together. `api/[...path].js` forwards API requests into the existing Express app through a cached initialization promise. MongoDB connections are reused within a warm function. The local MongoDB process is never started on Vercel.
+The Vite frontend and Express API deploy together. `api/handler.js` receives all API path depths through the explicit vercel.json rewrite and forwards requests into the existing Express app through a cached initialization promise. MongoDB connections are reused within a warm function. The local MongoDB process is never started on Vercel.
 
 ## Settings
 
