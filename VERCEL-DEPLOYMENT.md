@@ -8,15 +8,15 @@ The Vite frontend and Express API deploy together. `api/[...path].js` forwards A
 - Build: `npm run build`
 - Output directory: `dist`
 - Node.js: 24.x recommended
-- Production environment variables: MONGODB_URI, DEMO_USERNAME=evaluator, DEMO_PASSWORD (at least 16 characters).
+- Production environment variable: MONGODB_URI. DEMO_USERNAME and DEMO_PASSWORD are no longer used.
 - Do not prefix secrets with VITE_. Do not commit them.
 - Vercel's system variables select hosted mode and the production or preview URL. PUBLIC_BASE_URL is optional for an alternate custom domain.
 
-The API uses the same shared evaluator credentials as Render. The frontend now has a sign-in screen and keeps the authorization value only in memory, so a full refresh may require signing in again. Assignment labels are not separate team accounts.
+The workspace opens directly without login. Anyone with its URL can view and edit the same demo projects. Assignment labels are not accounts. Keep only synthetic sample data here.
 
 ## Verify
 
-Open /api/health: it must return JSON, never the Vercel NOT_FOUND page. A 503 JSON response identifies missing configuration or database connectivity. Projects require the shared login. Sign in through the app, create a project and task, refresh, sign in again if asked, and verify persistence.
+Open /api/health: it must return JSON, never the Vercel NOT_FOUND page. A 503 JSON response identifies missing configuration or database connectivity. Create a project and task without signing in, refresh, and verify persistence.
 
 Atlas must permit connections from the deployed Vercel backend. The laptop IP allowed during onboarding is not sufficient. Use the Atlas network configuration appropriate for your hosting environment. If database initialization fails, check Atlas access and the credentials stored privately in Vercel. Never share the database URI in screenshots.
 

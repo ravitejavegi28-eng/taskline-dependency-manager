@@ -90,4 +90,4 @@ Assign actual work rather than inventing retrospective contributions: one member
 
 ## Hosted evaluator access
 
-The app now supports Render with Atlas. Hosted mode uses one shared evaluator login (HTTP Basic over HTTPS), configured through private environment variables. It is not a multi-user permission system. Local mode remains available with no login. Read DEPLOYMENT.md for setup and health-check instructions.
+The app supports Render and Vercel with Atlas. Hosted mode is a public shared demo with no login. Anyone with the URL can view and edit the sample workspace. Read the deployment guides for database and health-check configuration.

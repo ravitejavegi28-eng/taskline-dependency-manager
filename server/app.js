@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 import mongoose from 'mongoose';
 import { Project, databaseMode } from './db.js';
 import { analyze, validateState, RuleError } from './graph.js';
-import { runtimeConfig, validDemoAuth } from './config.js';
+import { runtimeConfig } from './config.js';
 
 const clean = doc => { const { _id, ...p } = doc; return { ...p, tasks: analyze(p.tasks).tasks }; };
 function text(value, name, limit, required = false) {
@@ -24,13 +24,7 @@ export function createApp(config = runtimeConfig()) {
     if (!allowed) return res.status(403).json({ error: 'This host is not allowed for the workspace.' });
     next();
   });
-  app.get('/api/health', (req, res) => res.status(mongoose.connection.readyState === 1 ? 200 : 503).json({ status: mongoose.connection.readyState === 1 ? 'ok' : 'disconnected', database: databaseMode, connector: 'Mongoose', access: config.hosted ? 'Shared evaluator workspace' : 'Local single-user workspace' }));
-  if (config.hosted) app.use((req, res, next) => {
-    if (validDemoAuth(req.headers.authorization, config)) return next();
-    res.set('WWW-Authenticate', 'Basic realm="Taskline demo", charset="UTF-8"');
-    res.set('Cache-Control', 'no-store');
-    res.status(401).send('Sign in with the shared evaluator credentials to open Taskline.');
-  });
+  app.get('/api/health', (req, res) => res.status(mongoose.connection.readyState === 1 ? 200 : 503).json({ status: mongoose.connection.readyState === 1 ? 'ok' : 'disconnected', database: databaseMode, connector: 'Mongoose', access: config.hosted ? 'Public shared demo' : 'Local single-user workspace' }));
   app.use(express.json({ limit: '128kb' }));
   app.use('/api', (req, res, next) => {
     res.set('Cache-Control', 'no-store');

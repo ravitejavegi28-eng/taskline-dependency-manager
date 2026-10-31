@@ -84,11 +84,11 @@ Tests cover graph correctness and use a separate temporary real MongoDB instance
 
 Vercel hosting is also supported: follow [VERCEL-DEPLOYMENT.md](VERCEL-DEPLOYMENT.md). Its API adapter lives in the root `api` directory; deploy the whole repository.
 
-Render hosting is supported with MongoDB Atlas and a shared evaluator login. Follow [DEPLOYMENT.md](DEPLOYMENT.md). Local use requires no login.
+Render hosting is supported with MongoDB Atlas and a public shared demo workspace. Follow [DEPLOYMENT.md](DEPLOYMENT.md). Local use requires no login.
 
 ## Access and limitations
 
-Local mode is a **single-user hackathon prototype**, bound to 127.0.0.1. Render mode uses Atlas and one shared evaluator login configured with DEMO_USERNAME and DEMO_PASSWORD. Owner names remain task-assignment labels, not separate accounts. There is no per-user permission system. Share evaluator credentials privately and use synthetic project data.
+Local mode runs on 127.0.0.1. Hosted mode opens directly as a **public shared demo** backed by Atlas. Anyone with the site link can view and edit the same project data. Owner names are assignment labels, not accounts. Use only synthetic demo data; there is no login or per-user permission system.
 
 No critical-path calculations, duration-based scheduling, Gantt chart, email notifications, or calendar integrations are claimed. The app does not use an AI API. All sample people and tasks are fictional. MongoDB Atlas is supported through configuration but not provisioned by the app.
 
