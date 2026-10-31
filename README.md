@@ -1,4 +1,4 @@
-# Taskline â€” Project Dependency Manager
+# Taskline — Project Dependency Manager
 
 Hackathon problem: **HACK-P395**. A working local web application for organizing tasks, validating dependencies, and finding blocked work.
 
@@ -60,7 +60,7 @@ Design guidance: **ui-ux-pro-max** and **ui-styling**. Source design decisions a
 
 ## How dependency logic works
 
-The project is a directed acyclic graph. An edge A â†’ B means B requires A to finish first. Each task stores predecessor IDs in `dependencies`.
+The project is a directed acyclic graph. An edge A → B means B requires A to finish first. Each task stores predecessor IDs in `dependencies`.
 
 Before saving, the backend builds an adjacency map and runs **Kahn's topological algorithm**. If it cannot visit every task, the candidate graph contains a cycle and the save is rejected. Topological depth also provides graph columns. A breadth-first traversal of child links finds downstream impact.
 
