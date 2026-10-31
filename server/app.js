@@ -4,27 +4,43 @@ import { randomUUID } from 'node:crypto';
 import mongoose from 'mongoose';
 import { Project, databaseMode } from './db.js';
 import { analyze, validateState, RuleError } from './graph.js';
+import { runtimeConfig, validDemoAuth } from './config.js';
 
 const clean = doc => { const { _id, ...p } = doc; return { ...p, tasks: analyze(p.tasks).tasks }; };
 function text(value, name, limit, required = false) {
   if (typeof value !== 'string' || value.length > limit || (required && !value.trim())) throw new RuleError(`${name} must be ${required ? 'nonempty and ' : ''}at most ${limit} characters.`);
   return value.trim();
 }
-export function createApp() {
+export function createApp(config = runtimeConfig()) {
   const app = express();
   app.disable('x-powered-by');
   app.use(helmet({ contentSecurityPolicy: false }));
+  // Render terminates HTTPS at its proxy. Validate against the configured public
+  // origin rather than trusting client-supplied forwarded headers.
+  app.use((req, res, next) => {
+    const allowed = config.hosted
+      ? req.headers.host === new URL(config.origin).host
+      : ['127.0.0.1', 'localhost', '[::1]'].includes(req.hostname);
+    if (!allowed) return res.status(403).json({ error: 'This host is not allowed for the workspace.' });
+    next();
+  });
+  app.get('/api/health', (req, res) => res.status(mongoose.connection.readyState === 1 ? 200 : 503).json({ status: mongoose.connection.readyState === 1 ? 'ok' : 'disconnected', database: databaseMode, connector: 'Mongoose', access: config.hosted ? 'Shared evaluator workspace' : 'Local single-user workspace' }));
+  if (config.hosted) app.use((req, res, next) => {
+    if (validDemoAuth(req.headers.authorization, config)) return next();
+    res.set('WWW-Authenticate', 'Basic realm="Taskline demo", charset="UTF-8"');
+    res.set('Cache-Control', 'no-store');
+    res.status(401).send('Sign in with the shared evaluator credentials to open Taskline.');
+  });
   app.use(express.json({ limit: '128kb' }));
-  // Local single-user workspace. Reject cross-site mutations and DNS rebinding.
   app.use('/api', (req, res, next) => {
-    if (!['127.0.0.1', 'localhost', '[::1]'].includes(req.hostname)) return res.status(403).json({ error: 'This workspace accepts local connections only.' });
+    res.set('Cache-Control', 'no-store');
     if (!['GET', 'HEAD'].includes(req.method)) {
       if (!req.is('application/json')) return res.status(415).json({ error: 'Use application/json for workspace changes.' });
-      if (req.headers.origin && req.headers.origin !== `${req.protocol}://${req.headers.host}`) return res.status(403).json({ error: 'Cross-site changes are not allowed.' });
+      const origin = config.hosted ? config.origin : `${req.protocol}://${req.headers.host}`;
+      if (req.headers.origin && req.headers.origin !== origin) return res.status(403).json({ error: 'Cross-site changes are not allowed.' });
     }
     next();
   });
-  app.get('/api/health', (req, res) => res.json({ status: mongoose.connection.readyState === 1 ? 'ok' : 'disconnected', database: databaseMode, connector: 'Mongoose', access: 'Local single-user workspace' }));
   app.get('/api/projects', async (req, res) => res.json((await Project.find().lean()).map(clean)));
   app.post('/api/projects', async (req, res) => {
     const p = await Project.create({ id: randomUUID(), name: text(req.body.name, 'Project name', 80, true), description: text(req.body.description || '', 'Description', 500), tasks: [], activity: [], revision: 0 });

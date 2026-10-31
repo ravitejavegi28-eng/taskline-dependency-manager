@@ -19,3 +19,6 @@ API integration and browser mutation tests used separate disposable MongoDB data
 Known limits: local single-user prototype, no authentication/permissions, no critical-path scheduling, no hosted deployment, and no automatic test of every assistive technology. Atlas connection configuration is supported but was not tested against a cloud account.
 
 Additional full interaction audit: 30 button/workflow scenarios passed. See BUTTON-AUDIT.md. The browser audit runner is included in tests/browser-audit.cjs.
+
+
+Render adaptation: 15 automated checks pass, including hosted configuration, shared demo authentication, allowed host, HTTPS origin handling and health checks. Cloud settings were tested locally; the actual Render-to-Atlas connection must be verified after deployment. The browser audit was also rerun for local workflow regressions.

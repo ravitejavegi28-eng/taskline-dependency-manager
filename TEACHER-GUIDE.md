@@ -87,3 +87,7 @@ Explain your actual process honestly. This project was built with AI assistance.
 ## Suggested real team contributions
 
 Assign actual work rather than inventing retrospective contributions: one member can review and improve task workflows, another study and test graph rules, another verify API/database persistence, and another prepare the demo and responsive/accessibility checks. Record what each person really did.
+
+## Hosted evaluator access
+
+The app now supports Render with Atlas. Hosted mode uses one shared evaluator login (HTTP Basic over HTTPS), configured through private environment variables. It is not a multi-user permission system. Local mode remains available with no login. Read DEPLOYMENT.md for setup and health-check instructions.
